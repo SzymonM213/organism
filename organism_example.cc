@@ -14,6 +14,9 @@ int main() {
     constexpr Omnivore<species_id_t> dog(dog_id, 10);
     constexpr Carnivore<species_id_t> wolf(wolf_id, 100);
 
+    constexpr Plant<species_id_t> plant1(elephant_id, 100);
+    constexpr Plant<species_id_t> plant2(elephant_id, 100);
+
     constexpr auto encounter_result = encounter(wolf, dog);
     constexpr auto wolf_result = get<0>(encounter_result);
     constexpr auto dog_result = get<1>(encounter_result);
@@ -30,6 +33,7 @@ int main() {
     constexpr Plant<species_id_t> pine(pine_id, 34);
     constexpr Herbivore<species_id_t> elephant(elephant_id, 500);
     constexpr auto wolf_result_2 = encounter_series(wolf, wolf_result, pine, dog, elephant);
+    
 
     static_assert(!wolf_result_2.is_dead());
     static_assert(wolf_result_2.get_vitality() == 105);
