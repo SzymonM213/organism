@@ -130,11 +130,11 @@ namespace {
     }
 
 //carnivore meets plant
-    template<typename species_t, bool sp1_eats_m>
-    constexpr std::tuple<Carnivore<species_t>,
+    template <typename species_t, bool sp1_eats_m>
+    constexpr std::tuple<Organism<species_t, sp1_eats_m, false>,
             Plant<species_t>,
             std::optional<Organism<species_t, sp1_eats_m, false>>>
-    encounter_worker(Carnivore<species_t> &organism1,
+    encounter_worker(Organism<species_t, sp1_eats_m, false> &organism1,
                      Plant<species_t> &organism2) {
         return {organism1, organism2, {}};
     }
