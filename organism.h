@@ -51,9 +51,11 @@ using Plant = Organism<species_t, false, false>;
 
 template <typename species_t,  bool sp1_eats_m, bool sp1_eats_p, bool sp2_eats_m, bool sp2_eats_p>
 constexpr std::tuple<Organism<species_t, sp2_eats_m, sp2_eats_p>,
-        Organism<species_t, sp1_eats_m, sp1_eats_p>> swap_result(
+        Organism<species_t, sp1_eats_m, sp1_eats_p>, 
+        std::optional<Organism<species_t, sp2_eats_m, sp2_eats_p>>> swap_result(
         std::tuple<Organism<species_t, sp1_eats_m, sp1_eats_p>,
-                Organism<species_t, sp2_eats_m, sp2_eats_p>> organisms) {
+                Organism<species_t, sp2_eats_m, sp2_eats_p>,
+                std::optional<Organism<species_t, sp1_eats_m, sp1_eats_p>>> organisms) {
     return {get<1>(organisms), get<0>(organisms), {}};
 }
 
@@ -105,9 +107,12 @@ constexpr encounter_worker(Organism<species_t, true, sp1_eats_p> &organism1,
     if(organism1.get_vitality() > organism2.get_vitality()){
         organism1.add_vitality(organism2.get_vitality()/2);
         organism2.die();
-    } else{
+    } else if (organism1.get_vitality() < organism2.get_vitality()) {
         organism2.add_vitality(organism1.get_vitality()/2);
         organism1.die();
+    } else {
+        organism1.die();
+        organism2.die();
     }
     return {organism1, organism2, {}};
 }
@@ -122,15 +127,22 @@ encounter_worker(Organism<species_t, sp1_eats_m, false> &organism1,
 }
 
 template <typename species_t, bool sp1_eats_m>
+constexpr std::tuple<Plant<species_t>,
+                     Organism<species_t, sp1_eats_m, false>,
+                     std::optional<Plant<species_t>>>
+encounter_worker(Plant<species_t> &organism1,
+                 Organism<species_t, sp1_eats_m, false> &organism2) {
+    return swap_result(encounter_worker(organism2, organism1));
+}
+
+template <typename species_t, bool sp1_eats_m>
 constexpr std::tuple<Organism<species_t, sp1_eats_m, true>,
                      Plant<species_t>, 
                      std::optional<Organism<species_t, sp1_eats_m, true>>>
 encounter_worker(Organism<species_t, sp1_eats_m, true> &organism1,
           Plant<species_t> &organism2) {
-    if(organism1.get_vitality() > organism2.get_vitality()){
-        organism1.add_vitality(organism2.get_vitality());
-        organism2.die();
-    }
+    organism1.add_vitality(organism2.get_vitality());
+    organism2.die();
     return {organism1, organism2, {}};
 }
 
